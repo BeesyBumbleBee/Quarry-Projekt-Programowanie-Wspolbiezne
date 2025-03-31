@@ -1,0 +1,42 @@
+Kamieniołom.
+Założenia:
+Pracownicy kamieniołomu układają 3 typy bloków kamiennych na palecie (każdy swój typ).
+Bloki mają ustandaryzowane rozmiary o jednostkowej szerokości i wysokości. Długości
+bloków wynoszą 1, 2 lub 3 jednostki. Paleta ma rozmiar 3x3 jednostki (zob. rys.1). Bloki
+układane są warstwami. Każda warstwa musi być zapełniona całkowicie i zabezpieczona
+izolatorem. Pracownik sterujący ładowaniem układa izolator po ułożeniu każdej warstwy. Po
+ułożeniu 3 warstw gotowa paleta jest wysyłana transporterem.
+
+  |  |
+--+--+--
+  |  |
+--+--+--
+  |  |
+Rys. 1 - widok z góry warstwy palety
+
+Dodatkowym ograniczeniem przy układaniu bloków jest ich masa. Bloki o długościach 1, 2 i 3
+mają odpowiednio masę m1=1, m2=3 i m3=5 jednostek. Najniższa warstwa na palecie może
+mieć maksymalną sumaryczną masę M1=14 jednostek, warstwa druga M2=13 jednostek, a najwyższa warstwa M3=11 jednostek.
+
+Każdy pracownik (proces) wykonuje jedną z trzech akcji:
+    1. Wydobycie bloku kamienia -> ograniczona ilość miejsc pracy, gdy brakuje miejsc pracownicy ustawiają się w kolejkę
+    2. Ruch pomiędzy stanowsikiem pracy a składowiskiem -> wszyscy pracownicy mogą jednocześnie poruszać się pomiędzy miejscami
+    3. Ułożenie bloku na palecie -> tylko jeden pracownik na raz może w danym momencie układać blok, reszta pracowników ustawia się w kolejkę
+
+Dodatkowe aspekty symulacji:
+    - Pracownicy pokonują trasę do składowiska w innym czasie, niż od składowiska do stanowiska pracy (wynika to z przenoszenia bloku kamienia)
+    - Z dowolnego stanowiska pracy wydobywany może być dowolny typ bloku kamienia
+    - Jeśli z jakiegoś powodu pracownik aktualnie układający blok na palecie, nie będzie w stanie ułożyć bloku, to zwalnia
+        dostęp do palety i przechodzi na koniec kolejki
+
+Parametry ustalane w pliku konfiguracyjnym (JSON):
+    - czas potrzebny na wydobycie każdego z typów bloku kamiennego,
+    - masa każdego z typów bloku kamiennego,
+    - czas potrzebny na przebycie drogi między kamieniołomem a stanowiskiem pracy (z oraz bez ładunku),
+    - ilość stanowisk pracy,
+    - liczba pracowników wydobywających poszczególny typ bloku kamienia,
+    - ograniczenia masowe poszczególnych warst palety,
+    - czas potrzebny na ułożenie bloku na palecie,
+    - czas nakładania izolatora pomiędzy warstwami palety,
+    - czas wymiany palety na pustą,
+
