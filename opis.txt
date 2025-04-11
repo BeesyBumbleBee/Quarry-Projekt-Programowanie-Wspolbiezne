@@ -14,7 +14,7 @@ ułożeniu 3 warstw gotowa paleta jest wysyłana transporterem.
   |  |
 Rys. 1 - widok z góry warstwy palety
 
-Dodatkowym ograniczeniem przy układaniu bloków jest ich masa. Bloki o długościach 1, 2 i 3
+Dodatkowym ograniczeniem  układaniu bloków jest ich masa. Bloki o długościach 1, 2 i 3
 mają odpowiednio masę m1=1, m2=3 i m3=5 jednostek. Najniższa warstwa na palecie może
 mieć maksymalną sumaryczną masę M1=14 jednostek, warstwa druga M2=13 jednostek, a najwyższa warstwa M3=11 jednostek.
 
