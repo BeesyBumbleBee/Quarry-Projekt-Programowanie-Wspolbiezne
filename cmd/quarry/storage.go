@@ -126,9 +126,9 @@ func (s *Storage) findPlace(stoneMass int, stoneSize int) (int, int, int, bool) 
 			dir = 1
 			x = col
 			y = row
-			if !(s.canPlace(palletCopy, stoneSize, stoneMass, x, y, dir) && s.totalMass+stoneMass <= s.massLimit[s.level]) {
+			if !(s.canPlace(palletCopy, stoneSize, x, y, dir) && s.totalMass+stoneMass <= s.massLimit[s.level]) {
 				dir = -1
-				if !(s.canPlace(palletCopy, stoneSize, stoneMass, x, y, dir) && s.totalMass+stoneMass <= s.massLimit[s.level]) {
+				if !(s.canPlace(palletCopy, stoneSize, x, y, dir) && s.totalMass+stoneMass <= s.massLimit[s.level]) {
 					continue
 				}
 			}
@@ -140,7 +140,7 @@ func (s *Storage) findPlace(stoneMass int, stoneSize int) (int, int, int, bool) 
 	return 0, 0, 0, false
 }
 
-func (s *Storage) canPlace(pallet [3][3]int, stoneSize int, stoneMass int, col int, row int, dir int) bool {
+func (s *Storage) canPlace(pallet [3][3]int, stoneSize int, col int, row int, dir int) bool {
 	if dir >= 1 {
 		if col+stoneSize > 3 {
 			return false
