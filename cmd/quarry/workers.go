@@ -71,7 +71,7 @@ func makeWorkerId(workerType int, workerNo int) (string, error) {
 }
 
 func (w *Worker) Work() {
-	for true {
+	for {
 		select {
 		case <-w.done:
 			return
