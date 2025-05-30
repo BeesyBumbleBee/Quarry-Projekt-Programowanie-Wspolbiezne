@@ -42,14 +42,23 @@ func getConfig() SimulationConfig {
 		//fmt.Println("No config found, creating one with default values")
 		conf := defaultConfig()
 		file, err := os.Create("./config/config.json")
-		str, err := json.Marshal(conf)
+		var str []byte
+		str, err = json.Marshal(conf)
 		if err != nil {
 			fmt.Println("Couldn't create config file")
 			return conf
 		}
 
-		defer file.Close()
-		file.Write(str)
+		defer func(file *os.File) {
+			err = file.Close()
+			if err != nil {
+
+			}
+		}(file)
+		_, err = file.Write(str)
+		if err != nil {
+			return SimulationConfig{}
+		}
 		return conf
 	}
 	return conf
