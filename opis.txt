@@ -19,15 +19,15 @@ mają odpowiednio masę m1=1, m2=3 i m3=5 jednostek. Najniższa warstwa na palec
 mieć maksymalną sumaryczną masę M1=14 jednostek, warstwa druga M2=13 jednostek, a najwyższa warstwa M3=11 jednostek.
 
 Każdy pracownik (proces) wykonuje jedną z trzech akcji:
-    1. Wydobycie bloku kamienia -> ograniczona ilość miejsc pracy, gdy brakuje miejsc pracownicy ustawiają się w kolejkę
-    2. Ruch pomiędzy stanowsikiem pracy a składowiskiem -> wszyscy pracownicy mogą jednocześnie poruszać się pomiędzy miejscami
-    3. Ułożenie bloku na palecie -> tylko jeden pracownik na raz może w danym momencie układać blok, reszta pracowników ustawia się w kolejkę
+    1. Wydobycie bloku kamienia -> ograniczona ilość miejsc pracy, gdy brakuje miejsc pracownicy czekają na zwolnienie miejsca
+    2. Ruch pomiędzy stanowiskiem pracy a składowiskiem -> wszyscy pracownicy mogą jednocześnie poruszać się pomiędzy miejscami
+    3. Ułożenie bloku na palecie -> tylko jeden pracownik na raz może w danym momencie układać blok, pracownicy rywalizują o dostęp do palety
 
 Dodatkowe aspekty symulacji:
     - Pracownicy pokonują trasę do składowiska w innym czasie, niż od składowiska do stanowiska pracy (wynika to z przenoszenia bloku kamienia)
     - Z dowolnego stanowiska pracy wydobywany może być dowolny typ bloku kamienia
     - Jeśli z jakiegoś powodu pracownik aktualnie układający blok na palecie, nie będzie w stanie ułożyć bloku, to zwalnia
-        dostęp do palety i przechodzi na koniec kolejki
+        dostęp do palety i czeka aż ułożona zostanie aktualna warstwa/wymieniona zostanie paleta
 
 Parametry ustalane w pliku konfiguracyjnym (JSON):
     - czas potrzebny na wydobycie każdego z typów bloku kamiennego,
@@ -35,7 +35,7 @@ Parametry ustalane w pliku konfiguracyjnym (JSON):
     - czas potrzebny na przebycie drogi między kamieniołomem a stanowiskiem pracy (z oraz bez ładunku),
     - ilość stanowisk pracy,
     - liczba pracowników wydobywających poszczególny typ bloku kamienia,
-    - ograniczenia masowe poszczególnych warst palety,
+    - ograniczenia masowe poszczególnych warstw palety,
     - czas potrzebny na ułożenie bloku na palecie,
     - czas nakładania izolatora pomiędzy warstwami palety,
     - czas wymiany palety na pustą,
