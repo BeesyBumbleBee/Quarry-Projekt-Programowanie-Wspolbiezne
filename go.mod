@@ -7,8 +7,6 @@ toolchain go1.23.5
 require (
 	github.com/charmbracelet/bubbletea v1.3.4
 	github.com/charmbracelet/lipgloss v1.0.0
-	github.com/kopoli/go-terminal-size v0.0.0-20170219200355-5c97524c8b54
-	golang.org/x/crypto v0.37.0
 )
 
 require (
@@ -26,6 +24,5 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
-	golang.org/x/term v0.31.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
 )
