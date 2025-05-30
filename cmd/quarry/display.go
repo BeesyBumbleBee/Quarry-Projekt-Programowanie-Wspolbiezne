@@ -101,32 +101,6 @@ func (m *model) printStorageCells(cells [3][3]int, verticalBars [3][2]bool, hori
 			fmt.Sprintf("Currently placing: %2s", m.workerInStorage),
 			""})
 
-	/*
-		storage += fmt.Sprintf(" %c | %c | %c      || Layer: %1d \n",
-			cells[0], cells[1], cells[2], m.storage.level+1)
-
-		storage += fmt.Sprintf("   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m        ||\n")
-
-		storage += fmt.Sprintf("\033[48;2;153;76;0m\033[38;2;102;51;0m---+---+---\033[0m     || \n")
-
-		storage += fmt.Sprintf("   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m        || Currently placing: %3s\n",
-			m.workerInStorage)
-
-		storage += fmt.Sprintf(" %c | %c | %c      ||\n",
-			cells[3], cells[4], cells[5])
-
-		storage += fmt.Sprintf("   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m        ||\n")
-
-		storage += fmt.Sprintf("\033[48;2;153;76;0m\033[38;2;102;51;0m---+---+---\033[0m     ||\n")
-
-		storage += fmt.Sprintf("   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m        || Current Mass: %2d\n",
-			m.storage.totalMass)
-
-		storage += fmt.Sprintf(" %c | %c | %c      || Mass limit: %2d\n",
-			cells[6], cells[7], cells[8], m.storage.massLimit[m.storage.level])
-
-		storage += fmt.Sprintf("   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m   \033[48;2;153;76;0m\033[38;2;102;51;0m|\033[0m        ||")
-	*/
 	return storage
 }
 
