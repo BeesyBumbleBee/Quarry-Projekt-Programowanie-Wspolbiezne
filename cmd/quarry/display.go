@@ -98,7 +98,7 @@ func (m *model) printStorageCells(cells [3][3]int, verticalBars [3][2]bool, hori
 	storage += printPalletRow(cells[2], verticalBars[2],
 		[3]string{
 			"",
-			fmt.Sprintf("Currently placing: %2s", m.workerInStorage),
+			fmt.Sprintf("Currently placing: %4s", m.workerInStorage),
 			""})
 
 	return storage
