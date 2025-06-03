@@ -36,7 +36,7 @@ func defaultConfig() SimulationConfig {
 
 func getConfig() (SimulationConfig, error) {
 
-	read, err := os.ReadFile("./config/config.json")
+	read, err := os.ReadFile("./config.json")
 	if err != nil {
 		return defaultConfig(), err
 	}
@@ -45,7 +45,7 @@ func getConfig() (SimulationConfig, error) {
 	if err != nil {
 		//fmt.Println("No config found, creating one with default values")
 		conf := defaultConfig()
-		file, err := os.Create("./config/config.json")
+		file, err := os.Create("./config.json")
 		var str []byte
 		str, err = json.Marshal(conf)
 		if err != nil {
