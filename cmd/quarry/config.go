@@ -34,8 +34,12 @@ func defaultConfig() SimulationConfig {
 		TimeToChangePallet:    [2]int{1000, 2000}}
 }
 
-func getConfig() SimulationConfig {
+func getConfig() (SimulationConfig, error) {
+
 	read, err := os.ReadFile("./config/config.json")
+	if err != nil {
+		return defaultConfig(), err
+	}
 	conf := SimulationConfig{}
 	err = json.Unmarshal(read, &conf)
 	if err != nil {
@@ -46,7 +50,7 @@ func getConfig() SimulationConfig {
 		str, err = json.Marshal(conf)
 		if err != nil {
 			fmt.Println("Couldn't create config file")
-			return conf
+			return conf, err
 		}
 
 		defer func(file *os.File) {
@@ -57,16 +61,16 @@ func getConfig() SimulationConfig {
 		}(file)
 		_, err = file.Write(str)
 		if err != nil {
-			return SimulationConfig{}
+			return defaultConfig(), err
 		}
-		return conf
+		return conf, err
 	}
-	return conf
+	return conf, err
 
 }
 
 func (conf SimulationConfig) printConfig() string {
-	out := "Current config:\nq"
+	out := "Current config:\n"
 	v := reflect.ValueOf(conf)
 	typeOfConf := v.Type()
 	for i := 0; i < typeOfConf.NumField(); i++ {
