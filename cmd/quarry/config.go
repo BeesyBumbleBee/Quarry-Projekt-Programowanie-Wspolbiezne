@@ -22,13 +22,13 @@ type SimulationConfig struct {
 
 func defaultConfig() SimulationConfig {
 	return SimulationConfig{
-		WorkersAmount:         [3]int{1, 1, 1},
-		StonesExtractionTime:  [3][2]int{{1000, 2500}, {1000, 2500}, {3000, 4500}},
+		WorkersAmount:         [3]int{2, 2, 3},
+		StonesExtractionTime:  [3][2]int{{500, 2000}, {1000, 2500}, {2000, 3500}},
 		StonesMasses:          [3]int{1, 3, 5},
 		StoneMassesLimits:     [3]int{14, 13, 11},
-		TimeToTravelEmpty:     [2]int{50, 250},
-		TimeToTravelFull:      [2]int{200, 500},
-		QuarryWorkplaces:      4,
+		TimeToTravelEmpty:     [2]int{50, 100},
+		TimeToTravelFull:      [2]int{100, 200},
+		QuarryWorkplaces:      3,
 		TimeToPlaceStone:      [2]int{300, 1500},
 		TimeToPlaceInsulation: [2]int{500, 1000},
 		TimeToChangePallet:    [2]int{1000, 2000}}
@@ -78,4 +78,30 @@ func (conf SimulationConfig) printConfig() string {
 	}
 	out += "\n"
 	return out
+}
+
+func (conf SimulationConfig) saveConfig() error {
+	file, err := os.Create("./config.json")
+	if err != nil {
+		fmt.Println("Couldn't create config file")
+		return err
+	}
+	var str []byte
+	str, err = json.Marshal(conf)
+	if err != nil {
+		fmt.Println("Couldn't create json")
+		return err
+	}
+
+	defer func(file *os.File) {
+		err = file.Close()
+		if err != nil {
+
+		}
+	}(file)
+	_, err = file.Write(str)
+	if err != nil {
+		return err
+	}
+	return nil
 }
