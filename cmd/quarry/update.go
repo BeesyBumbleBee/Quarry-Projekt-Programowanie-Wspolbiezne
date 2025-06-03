@@ -30,7 +30,7 @@ type model struct {
 
 const (
 	title       = "The Quarry\n"
-	mainMessage = "Press q to quit\t Press TAB to modify config"
+	mainMessage = "Press q to quit"
 )
 
 // Init
