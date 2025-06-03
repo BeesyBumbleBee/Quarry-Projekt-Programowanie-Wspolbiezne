@@ -178,8 +178,11 @@ func (m *model) View() string {
 
 	// Logs
 	logs := "LOGS:\n"
-	for log := range m.logs {
-		logs += m.logs[log] + "\n"
+	for i := 0; i < m.logsSize-1; i++ {
+		logs += m.logs[i]
+		if i != m.logsSize-1 {
+			logs += "\n"
+		}
 	}
 
 	// Creating views
@@ -199,9 +202,11 @@ func (m *model) View() string {
 	messageBox = lipgloss.Place(maxWidth, 2, 0.5, 0, messageBox)
 	messageBox = windowStyle.Width(maxWidth + 1).Render(messageBox)
 	storageQ = windowStyle.Width(maxWidth / 2).Render(storageQ)
-	workstationQ = windowStyle.Width(maxWidth/2 - 1).Render(workstationQ)
+	workstationQ = windowStyle.Width(maxWidth / 2).Render(workstationQ)
 	config = windowStyle.Width(maxWidth * 4 / 7).Height(terminalHeight - lipgloss.Height(messageBox) - lipgloss.Height(workstationQ) - lipgloss.Height(workstation) - 2).Render(config)
 	logs = windowStyle.Width(maxWidth * 3 / 7).Height(lipgloss.Height(config) - 2).Render(logs)
+
+	m.logsDesiredCapacity = lipgloss.Height(config) - 5
 
 	// Gluing views together
 	screen1 := messageBox
