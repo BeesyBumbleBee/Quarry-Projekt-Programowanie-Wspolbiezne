@@ -244,6 +244,9 @@ Time To Change Pallet:      min = %s max = %s
 
 Quarry Workplaces = %s
 
+All times are given in ms.
+Time to travel empty and time to travel full are times it takes for worker to take 1 step,
+there are 50 steps between storage and workstations.
 
 Press TAB \ Shift-TAB to cycle between input fields.
 Press ESC to go back to main menu.
