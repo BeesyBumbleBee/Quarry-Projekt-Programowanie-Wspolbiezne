@@ -33,7 +33,7 @@ Parametry ustalane w pliku konfiguracyjnym (JSON):
     - czas potrzebny na wydobycie każdego z typów bloku kamiennego,
     - masa każdego z typów bloku kamiennego,
     - czas potrzebny na przebycie drogi między kamieniołomem a stanowiskiem pracy (z oraz bez ładunku),
-    - ilość stanowisk pracy,
+    - liczba stanowisk pracy,
     - liczba pracowników wydobywających poszczególny typ bloku kamienia,
     - ograniczenia masowe poszczególnych warstw palety,
     - czas potrzebny na ułożenie bloku na palecie,
