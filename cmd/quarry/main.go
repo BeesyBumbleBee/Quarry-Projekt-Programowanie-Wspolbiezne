@@ -3,44 +3,61 @@ package main
 import (
 	tea "github.com/charmbracelet/bubbletea"
 	"log"
+	"os"
 )
 
 func main() {
-	conf := getConfig()
+	conf, err := startMainMenu()
+	if err != nil {
+		os.Exit(0)
+	}
+	err = startSimulation(conf)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func startSimulation(cfg SimulationConfig) error {
+	var err error = nil
 
 	workerAmount := 0
-	for workerType := range len(conf.WorkersAmount) {
-		workerAmount += conf.WorkersAmount[workerType]
+	for workerType := range len(cfg.WorkersAmount) {
+		workerAmount += cfg.WorkersAmount[workerType]
 	}
 
-	model := initialModel(conf, workerAmount, 15)
+	model := initialModel(cfg, workerAmount, 40)
 	prog := tea.NewProgram(&model, tea.WithAltScreen(), tea.WithoutSignalHandler()) // implement ^C as interrupt or other way to close the program
-	model.storage = InitStorage(conf, prog)
-	model.workstations = InitWorkstations(conf.QuarryWorkplaces)
+	model.storage = InitStorage(cfg, prog)
+	model.workstations = InitWorkstations(cfg.QuarryWorkplaces)
 
 	i := 0
-	for workerType := range len(conf.WorkersAmount) {
-		for workerNo := range conf.WorkersAmount[workerType] {
-			workerId, err := makeWorkerId(workerType, workerNo)
+	for workerType := range len(cfg.WorkersAmount) {
+		for workerNo := range cfg.WorkersAmount[workerType] {
+			var workerId string
+			workerId, err = makeWorkerId(workerType, workerNo)
 
 			if err != nil {
-				log.Fatal(err)
+				return err
 			}
+
 			model.workerPos[workerId] = 0
 			model.workstationQueue = append(model.workstationQueue, false)
 			model.storageQueue = append(model.storageQueue, false)
 			model.workerIds[workerId] = i
-			model.workers[i] = initWorker(workerId, workerType, model.storage, model.workstations, prog, conf)
+			model.workers[i] = initWorker(workerId, workerType, model.storage, model.workstations, prog, cfg)
 			i++
 		}
 	}
 
-	if _, err := prog.Run(); err != nil {
-		log.Fatal(err)
+	if _, err = prog.Run(); err != nil {
+		return err
 	}
-
 	// Clean up
-	for w := range model.workers {
-		model.workers[w].done <- true
-	}
+	defer func() {
+		for w := range model.workers {
+			model.workers[w].done <- true
+		}
+	}()
+
+	return err
 }
