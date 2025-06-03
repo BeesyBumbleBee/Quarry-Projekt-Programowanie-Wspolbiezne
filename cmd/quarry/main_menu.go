@@ -44,7 +44,7 @@ const (
 func numberValidator(s string) error {
 	num, err := strconv.Atoi(s)
 	if num < 0 {
-		err = errors.New("Number has to be a positive integer")
+		err = errors.New("number has to be a positive integer")
 		return err
 	}
 	return err
@@ -57,7 +57,7 @@ type (
 type MainMenu struct {
 	cfg                 SimulationConfig
 	inputs              []textinput.Model
-	configInputfocused  int
+	configInputFocused  int
 	menuOptionFocused   int
 	err                 error
 	inMenu              bool
@@ -68,7 +68,7 @@ type MainMenu struct {
 }
 
 func initialMainMenu() MainMenu {
-	var inputs []textinput.Model = make([]textinput.Model, 26)
+	var inputs = make([]textinput.Model, 26)
 	for input := range inputs {
 		inputs[input] = textinput.New()
 		inputs[input].Validate = numberValidator
@@ -79,7 +79,7 @@ func initialMainMenu() MainMenu {
 	}
 	inputs[0].Focus()
 	menuOptions := make([]rune, 2)
-	for i, _ := range menuOptions {
+	for i := range menuOptions {
 		menuOptions[i] = ' '
 	}
 	menuOptions[0] = selector
@@ -88,7 +88,7 @@ func initialMainMenu() MainMenu {
 		inputs:             inputs,
 		winWidth:           0,
 		winHeight:          0,
-		configInputfocused: 0,
+		configInputFocused: 0,
 		menuOptionFocused:  0,
 		err:                nil,
 		cfg:                SimulationConfig{},
@@ -151,7 +151,7 @@ func (m *MainMenu) Init() tea.Cmd {
 }
 
 func (m *MainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	var cmds []tea.Cmd = make([]tea.Cmd, len(m.inputs))
+	var cmds = make([]tea.Cmd, len(m.inputs))
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
@@ -162,7 +162,7 @@ func (m *MainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyEnter:
 			if m.inConfig {
-				if m.configInputfocused == len(m.inputs)-1 {
+				if m.configInputFocused == len(m.inputs)-1 {
 					return m, tea.Quit
 				}
 				m.nextInput()
@@ -187,7 +187,7 @@ func (m *MainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.nextInput()
 		case tea.KeyUp:
 			m.menuOptionFocused = (m.menuOptionFocused - 1) % len(m.menuOptions)
-			for i, _ := range m.menuOptions {
+			for i := range m.menuOptions {
 				if i == m.menuOptionFocused {
 					m.menuOptions[i] = selector
 				} else {
@@ -196,7 +196,7 @@ func (m *MainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		case tea.KeyDown:
 			m.menuOptionFocused = (m.menuOptionFocused + 1) % len(m.menuOptions)
-			for i, _ := range m.menuOptions {
+			for i := range m.menuOptions {
 				if i == m.menuOptionFocused {
 					m.menuOptions[i] = selector
 				} else {
@@ -207,7 +207,7 @@ func (m *MainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		for i := range m.inputs {
 			m.inputs[i].Blur()
 		}
-		m.inputs[m.configInputfocused].Focus()
+		m.inputs[m.configInputFocused].Focus()
 
 	// We handle errors just like any other message
 	case errMsg:
@@ -284,15 +284,15 @@ Press Ctrl-Q to quit.
 
 // nextInput focuses the next input field
 func (m *MainMenu) nextInput() {
-	m.configInputfocused = (m.configInputfocused + 1) % len(m.inputs)
+	m.configInputFocused = (m.configInputFocused + 1) % len(m.inputs)
 }
 
 // prevInput focuses the previous input field
 func (m *MainMenu) prevInput() {
-	m.configInputfocused--
+	m.configInputFocused--
 	// Wrap around
-	if m.configInputfocused < 0 {
-		m.configInputfocused = len(m.inputs) - 1
+	if m.configInputFocused < 0 {
+		m.configInputFocused = len(m.inputs) - 1
 	}
 }
 
