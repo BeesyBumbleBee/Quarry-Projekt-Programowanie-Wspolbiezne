@@ -19,7 +19,9 @@ type model struct {
 	workstations        *Workstations
 	message             string
 	logs                []string
-	logsSettings        [2]int
+	logsSize            int
+	logsCapacity        int
+	logsDesiredCapacity int
 	workerIds           map[string]int
 	storageQueue        []bool
 	workstationQueue    []bool
@@ -34,22 +36,24 @@ const (
 // Init
 func initialModel(cfg SimulationConfig, workerAmout int, maxLogs int) model {
 	return model{
-		palletsFilled:    0,
-		winWidth:         0,
-		winHeight:        0,
-		cfg:              cfg,
-		workerPos:        make(map[string]int),
-		workers:          make([]Worker, workerAmout),
-		workerInStorage:  "",
-		storage:          nil,
-		workstations:     nil,
-		message:          title + mainMessage,
-		logsSettings:     [2]int{0, maxLogs},
-		logs:             make([]string, maxLogs),
-		workerIds:        make(map[string]int),
-		storageQueue:     []bool{},
-		workstationQueue: []bool{},
-		workersAtWork:    0,
+		palletsFilled:       0,
+		winWidth:            0,
+		winHeight:           0,
+		cfg:                 cfg,
+		workerPos:           make(map[string]int),
+		workers:             make([]Worker, workerAmout),
+		workerInStorage:     "",
+		storage:             nil,
+		workstations:        nil,
+		message:             title + mainMessage,
+		logsSize:            0,
+		logsCapacity:        1,
+		logsDesiredCapacity: 1,
+		logs:                make([]string, maxLogs),
+		workerIds:           make(map[string]int),
+		storageQueue:        []bool{},
+		workstationQueue:    []bool{},
+		workersAtWork:       0,
 	}
 }
 
@@ -60,15 +64,26 @@ func (m *model) log(msg string, colorFg [3]int, colorBg ...[3]int) {
 	if len(colorBg) > 0 {
 		colorCodeBg = fmt.Sprintf("\033[48;2;%d;%d;%dm", colorBg[0][0], colorBg[0][1], colorBg[0][2])
 	}
-	if m.logsSettings[0] != m.logsSettings[1] {
-		m.logs[m.logsSettings[0]] = colorCodeFg + colorCodeBg + timeStamp() + " : " + msg + clearColor
-		m.logsSettings[0]++
+
+	m.logs[m.logsCapacity-1] = colorCodeFg + colorCodeBg + timeStamp() + " : " + msg + clearColor
+	if m.logsDesiredCapacity != m.logsCapacity {
+		if m.logsDesiredCapacity < m.logsCapacity {
+			for i := 0; i < m.logsDesiredCapacity; i++ {
+				m.logs[i] = m.logs[i+(m.logsCapacity-m.logsDesiredCapacity)]
+			}
+			m.logsSize = min(m.logsDesiredCapacity, cap(m.logs))
+		}
+		m.logsCapacity = min(m.logsDesiredCapacity, cap(m.logs))
+	}
+
+	if m.logsSize != m.logsCapacity {
+		m.logs[m.logsSize] = colorCodeFg + colorCodeBg + timeStamp() + " : " + msg + clearColor
+		m.logsSize++
 		return
 	}
-	for i := range m.logsSettings[1] - 1 {
+	for i := range m.logsCapacity - 1 {
 		m.logs[i] = m.logs[i+1]
 	}
-	m.logs[m.logsSettings[1]-1] = colorCodeFg + colorCodeBg + timeStamp() + " : " + msg + clearColor
 
 }
 
