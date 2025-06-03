@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"math"
 	"strconv"
 )
 
@@ -64,6 +65,7 @@ type MainMenu struct {
 	inConfig            bool
 	menuOptions         []rune
 	exitApp             bool
+	msg                 string
 	winWidth, winHeight int
 }
 
@@ -94,6 +96,7 @@ func initialMainMenu() MainMenu {
 		cfg:                SimulationConfig{},
 		inConfig:           false,
 		exitApp:            false,
+		msg:                "",
 		menuOptions:        menuOptions,
 	}
 }
@@ -162,6 +165,7 @@ func (m *MainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch msg.Type {
 		case tea.KeyEnter:
 			if m.inConfig {
+				m.msg = ""
 				if m.configInputFocused == len(m.inputs)-1 {
 					return m, tea.Quit
 				}
@@ -177,16 +181,30 @@ func (m *MainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlQ:
 			m.exitApp = true
 			return m, tea.Quit
+		case tea.KeyCtrlS:
+			var err error
+			m.cfg, err = configFromInputs(m.inputs)
+			if err != nil {
+				m.msg = err.Error()
+				break
+			}
+			err = m.cfg.saveConfig()
+			if err != nil {
+				m.msg = err.Error()
+			}
+			m.msg = "Config Saved"
 		case tea.KeyCtrlC:
 			return m, tea.Quit
 		case tea.KeyEsc:
 			m.inConfig = false
 		case tea.KeyShiftTab, tea.KeyCtrlP:
+			m.msg = ""
 			m.prevInput()
 		case tea.KeyTab, tea.KeyCtrlN:
+			m.msg = ""
 			m.nextInput()
 		case tea.KeyUp:
-			m.menuOptionFocused = (m.menuOptionFocused - 1) % len(m.menuOptions)
+			m.menuOptionFocused = int(math.Abs(float64(m.menuOptionFocused-1))) % len(m.menuOptions)
 			for i := range m.menuOptions {
 				if i == m.menuOptionFocused {
 					m.menuOptions[i] = selector
@@ -251,6 +269,9 @@ there are 50 steps between storage and workstations.
 Press TAB \ Shift-TAB to cycle between input fields.
 Press ESC to go back to main menu.
 Press CTRL+C to start simulation.
+Press CTRL+S to save this config.
+
+%s
 `,
 			padString("Simulation Configuration", " ", m.winWidth),
 			padString("", "=", m.winWidth*2),
@@ -263,7 +284,8 @@ Press CTRL+C to start simulation.
 			m.inputs[time_to_place_stoneMIN].View(), m.inputs[time_to_place_stoneMAX].View(),
 			m.inputs[time_to_place_insulationMIN].View(), m.inputs[time_to_place_insulationMAX].View(),
 			m.inputs[time_to_change_palletMIN].View(), m.inputs[time_to_change_palletMAX].View(),
-			m.inputs[quarry_workplaces].View())
+			m.inputs[quarry_workplaces].View(),
+			padString(m.msg, " ", m.winWidth))
 	} else {
 		view = fmt.Sprintf(
 			`%s
@@ -329,6 +351,18 @@ func configFromInputs(inputs []textinput.Model) (SimulationConfig, error) {
 	cfg.TimeToChangePallet[0], _ = strconv.Atoi(inputs[time_to_change_palletMIN].Value())
 	cfg.TimeToChangePallet[1], _ = strconv.Atoi(inputs[time_to_change_palletMAX].Value())
 	cfg.QuarryWorkplaces, _ = strconv.Atoi(inputs[quarry_workplaces].Value())
+
+	if cfg.StonesExtractionTime[0][0] > cfg.StonesExtractionTime[0][1] ||
+		cfg.StonesExtractionTime[1][0] > cfg.StonesExtractionTime[1][1] ||
+		cfg.StonesExtractionTime[2][0] > cfg.StonesExtractionTime[2][1] ||
+		cfg.TimeToTravelEmpty[0] > cfg.TimeToTravelEmpty[1] ||
+		cfg.TimeToTravelFull[0] > cfg.TimeToTravelFull[1] ||
+		cfg.TimeToPlaceStone[0] > cfg.TimeToPlaceStone[1] ||
+		cfg.TimeToPlaceInsulation[0] > cfg.TimeToPlaceInsulation[1] ||
+		cfg.TimeToChangePallet[0] > cfg.TimeToChangePallet[1] {
+		err = errors.New("min value cannot be larger than max value")
+		return cfg, err
+	}
 
 	return cfg, err
 }
