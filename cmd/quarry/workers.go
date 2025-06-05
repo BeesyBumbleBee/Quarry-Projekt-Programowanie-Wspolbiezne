@@ -47,7 +47,7 @@ func initWorker(id string, workerType int, storage *Storage, workstations *Works
 		workerType:     workerType,
 		position:       48,
 		goingToStorage: true,
-		done:           make(chan bool),
+		done:           make(chan bool, 1),
 		storage:        storage,
 		workstations:   workstations,
 		program:        program,
@@ -83,7 +83,9 @@ func (w *Worker) Work() {
 			w.tryWork()
 		} else if w.position == 0 && !w.goingToStorage {
 			w.goingToStorage = true
-			w.tryPlace()
+			if !w.tryPlace() {
+				return
+			}
 		} else {
 			if w.goingToStorage {
 				w.move(1)
@@ -112,13 +114,19 @@ func (w *Worker) delayPlace() {
 		w.rand.Intn(w.cfg.TimeToPlaceStone[1]-w.cfg.TimeToPlaceStone[0])) * time.Millisecond)
 }
 
-func (w *Worker) tryPlace() {
+func (w *Worker) tryPlace() bool {
 	w.program.Send(workerAtStorage{w.id})
 	w.storage.hasPalletCleared.L.Lock()
 	for !w.storage.Place(w.workerType, w.id, w.delayPlace) {
+		select { // check if program wasn't termintated while waiting
+		case <-w.done:
+			return false
+		default:
+		}
 		w.storage.hasPalletCleared.Wait()
 	}
 	w.storage.hasPalletCleared.L.Unlock()
+	return true
 }
 
 func (w *Worker) tryWork() {

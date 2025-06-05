@@ -57,7 +57,8 @@ func startSimulation(cfg SimulationConfig) error {
 		for w := range model.workers {
 			model.workers[w].done <- true
 		}
+		model.storage.hasPalletCleared.Broadcast() // make sure no worker is waiting for storage conditional variable
 	}()
 
-	return err
+	return nil
 }
