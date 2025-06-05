@@ -127,20 +127,19 @@ func (m *model) printStorageCells(cells [3][3]int, verticalBars [3][2]bool, hori
 	return storage
 }
 
-func (m *model) printWorkstations() string {
+func (m *model) printWorkstations(width int) string {
 	workstation := ""
-	i := m.cfg.QuarryWorkplaces - 1/3
+	bytes := 0
 	for station := 0; station < m.cfg.QuarryWorkplaces; station++ {
 		workerAtStation := " "
 		if station < m.workersAtWork {
 			workerAtStation = "\u263B"
 		}
 		workstation += fmt.Sprintf(" %s \u2692  ", workerAtStation)
-		if i == 0 {
+		bytes += 6
+		if bytes%width == 0 {
 			workstation += "\n"
-			i = m.cfg.QuarryWorkplaces - 1/3
 		}
-		i--
 	}
 	return workstation
 }
@@ -148,43 +147,55 @@ func (m *model) printWorkstations() string {
 func (m *model) View() string {
 	screen := ""
 
-	maxWidth := 0
-	terminalWidth = m.winWidth - 4
-	terminalHeight = m.winHeight
+	terminalWidth = m.winWidth - 8
+	terminalHeight = m.winHeight - 4
 
 	// Storage
+	storageWidth := terminalWidth / 4
 	storage := m.printStorageCells(m.storage.cells, m.storage.verticalBars, m.storage.horizontalBars)
+	storage = windowStyle.PaddingLeft(5).Width(storageWidth).Render(storage)
+	storageHeight := lipgloss.Height(storage) - 2
 
 	// Road
+	roadWidth := terminalWidth / 4
 	road := m.printRoad()
-
-	// Workstation
-	workstation := m.printWorkstations()
-
-	// MessageBox
-	messageBox := m.message
+	road = lipgloss.Place(roadWidth, 9, 0, 1, road)
+	road = windowStyle.PaddingLeft(3).Width(roadWidth).Height(storageHeight).Render(road)
 
 	// StorageQueue
+	storageQWidth := terminalWidth * 3 / 8
 	storageQ := "Waiting at storage: "
 	for worker, inQueue := range m.storageQueue {
 		if inQueue {
 			storageQ += m.workers[worker].id + " "
 		}
 	}
+	storageQ = windowStyle.Width(storageQWidth).Render(storageQ)
 
 	// WorkstationQueue
+	workstationQWidth := terminalWidth*2/8 + 1
+
 	workstationQ := "Waiting at workstations: "
 	for worker, inQueue := range m.workstationQueue {
 		if inQueue {
 			workstationQ += m.workers[worker].id + " "
 		}
 	}
+	workstationQ = windowStyle.Width(workstationQWidth).Render(workstationQ)
 
-	// Config
-	config := m.cfg.printConfig()
-	// TODO: Add dynamic max log amount based on terminal height
+	// Workstation
+	workstationWidth := terminalWidth / 8
+	workstation := m.printWorkstations(workstationWidth - 4)
+	workstation = windowStyle.Width(workstationWidth).Height(storageHeight).Render(workstation)
+
+	// MessageBox
+	messageBox := m.message
+	messageBox = lipgloss.Place(terminalWidth, 2, 0.5, 0, messageBox)
+	messageBox = windowStyle.Width(terminalWidth + 4).Render(messageBox)
 
 	// Logs
+	logsWidth := terminalWidth * 3 / 8
+	logsHeight := terminalHeight - lipgloss.Height(messageBox) + 2
 	logs := "LOGS:\n"
 	for i := 0; i < m.logsSize-1; i++ {
 		logs += m.logs[i]
@@ -192,37 +203,25 @@ func (m *model) View() string {
 			logs += "\n"
 		}
 	}
+	logs = windowStyle.Width(logsWidth).Height(logsHeight).Render(logs)
+	m.logsDesiredCapacity = lipgloss.Height(logs) - 4
 
-	// Creating views
-	storageWidth := (terminalWidth * 2 / 5) - lipgloss.Width(storage)
-	storage = windowStyle.PaddingLeft(storageWidth / 2).PaddingRight(storageWidth / 2).Render(storage)
-	storageHeight := lipgloss.Height(storage) - 2
+	// Config
+	configWidth := terminalWidth*5/8 + 3
+	configHeight := terminalHeight - storageHeight - lipgloss.Height(messageBox) - lipgloss.Height(storageQ)
 
-	roadWidth := (terminalWidth * 2 / 5) - lipgloss.Width(road)
-	road = lipgloss.Place(roadWidth, 9, 0, 1, road)
-	road = windowStyle.PaddingRight(roadWidth / 2).PaddingLeft(roadWidth / 2).Height(storageHeight).Render(road)
-
-	workstationWidth := (terminalWidth * 1 / 5) - lipgloss.Width(workstation)
-	workstation = windowStyle.Height(storageHeight).PaddingRight(workstationWidth / 2).PaddingLeft(workstationWidth / 2).Render(workstation)
-
-	maxWidth += lipgloss.Width(storage) + lipgloss.Width(workstation) + lipgloss.Width(road) - 3
-
-	messageBox = lipgloss.Place(maxWidth, 2, 0.5, 0, messageBox)
-	messageBox = windowStyle.Width(maxWidth + 1).Render(messageBox)
-	storageQ = windowStyle.Width(maxWidth / 2).Render(storageQ)
-	workstationQ = windowStyle.Width(maxWidth / 2).Render(workstationQ)
-	config = windowStyle.Width(maxWidth * 4 / 7).Height(terminalHeight - lipgloss.Height(messageBox) - lipgloss.Height(workstationQ) - lipgloss.Height(workstation) - 2).Render(config)
-	logs = windowStyle.Width(maxWidth * 3 / 7).Height(lipgloss.Height(config) - 2).Render(logs)
-
-	m.logsDesiredCapacity = lipgloss.Height(config) - 5
+	config := m.cfg.printConfig()
+	config = windowStyle.Width(configWidth).Height(configHeight).Render(config)
 
 	// Gluing views together
 	screen1 := messageBox
 	screen2 := lipgloss.JoinHorizontal(0, storageQ, workstationQ)
 	screen3 := lipgloss.JoinHorizontal(0, storage, road, workstation)
-	screen4 := lipgloss.JoinHorizontal(0, config, logs)
+	screen4 := lipgloss.JoinHorizontal(0, config)
 
-	screen = lipgloss.JoinVertical(0, screen1, screen2, screen3, screen4)
+	screen5 := lipgloss.JoinVertical(0, screen2, screen3, screen4)
+	screen6 := lipgloss.JoinHorizontal(0, screen5, logs)
+	screen = lipgloss.JoinVertical(1, screen1, screen6)
 
 	return screen
 }
