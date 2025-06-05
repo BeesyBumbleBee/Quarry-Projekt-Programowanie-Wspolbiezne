@@ -129,6 +129,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case workerWorking:
 		m.workstationQueue[m.workerIds[msg.workerId]] = false
 		m.log(msg.workerId+" started working.", [3]int{180, 180, 180})
+		m.workerPos[msg.workerId] = -1
 	case workerFinishedWork:
 		m.workstationQueue[m.workerIds[msg.workerId]] = false
 		m.workersAtWork--
@@ -138,6 +139,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.storageQueue[m.workerIds[msg.workerId]] = false
 		m.log(msg.workerId+" is placing stone block.", [3]int{255, 255, 204})
 		m.workerInStorage = msg.workerId
+		m.workerPos[msg.workerId] = -1
 		break
 	case storageWorkerFinishedPlacing:
 		m.log(msg.workerId+" is finished placing stone block.", [3]int{204, 255, 204})
@@ -147,6 +149,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.storageQueue[m.workerIds[msg.workerId]] = true
 		m.log(msg.workerId+" can't place stone block.", [3]int{255, 0, 0})
 		m.workerInStorage = ""
+		m.workerPos[msg.workerId] = msg.workerPos
 		break
 	case palletFullMsg:
 		m.palletsFilled++

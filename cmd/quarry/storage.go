@@ -26,7 +26,8 @@ type storageWorkerPlacing struct {
 }
 
 type storageWorkerCantPlace struct {
-	workerId string
+	workerId  string
+	workerPos int
 }
 
 type storageWorkerFinishedPlacing struct {
@@ -66,7 +67,7 @@ func (s *Storage) Place(stoneType int, workerId string, delay func()) bool {
 	if !can {
 		s.placeMutex.Unlock()
 		s.replaceMutex.Unlock()
-		s.program.Send(storageWorkerCantPlace{workerId})
+		s.program.Send(storageWorkerCantPlace{workerId, stoneType * 50})
 		return false
 	}
 

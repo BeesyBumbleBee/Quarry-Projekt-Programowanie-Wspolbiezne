@@ -80,6 +80,29 @@ func printPalletHorizontalBars(horizontalBars [3]bool, msg string) string {
 	return res
 }
 
+func (m *model) printRoad() string {
+	var road string
+
+	roadCells := make([]rune, 150)
+	for i := 0; i < 150; i++ {
+		roadCells[i] = '.'
+	}
+
+	for _, pos := range m.workerPos {
+		if pos != -1 {
+			roadCells[pos] = '\u263B'
+		}
+	}
+
+	for i := 0; i < 150; i++ {
+		if (i%50 == 0) && (i != 0) {
+			road += "\n\n\n"
+		}
+		road += string(roadCells[i])
+	}
+	return road
+}
+
 func (m *model) printStorageCells(cells [3][3]int, verticalBars [3][2]bool, horizontalBars [2][3]bool) string {
 
 	storage := printPalletRow(cells[0], verticalBars[0],
@@ -133,22 +156,7 @@ func (m *model) View() string {
 	storage := m.printStorageCells(m.storage.cells, m.storage.verticalBars, m.storage.horizontalBars)
 
 	// Road
-	road := ""
-	roadCells := make([]rune, 150)
-	for i := 0; i < 150; i++ {
-		roadCells[i] = '.'
-	}
-
-	for _, pos := range m.workerPos {
-		roadCells[pos] = '\u263B'
-	}
-
-	for i := 0; i < 150; i++ {
-		if (i%50 == 0) && (i != 0) {
-			road += "\n\n\n"
-		}
-		road += string(roadCells[i])
-	}
+	road := m.printRoad()
 
 	// Workstation
 	workstation := m.printWorkstations()

@@ -79,9 +79,11 @@ func (w *Worker) Work() {
 		}
 
 		if w.position == 49 && w.goingToStorage {
+			w.position = 50
 			w.goingToStorage = false
 			w.tryWork()
 		} else if w.position == 0 && !w.goingToStorage {
+			w.position = -1
 			w.goingToStorage = true
 			if !w.tryPlace() {
 				return
