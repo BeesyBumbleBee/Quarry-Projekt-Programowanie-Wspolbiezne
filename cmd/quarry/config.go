@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"reflect"
 )
 
 type SimulationConfig struct {
@@ -69,25 +68,49 @@ func getConfig() (SimulationConfig, error) {
 
 }
 
-func (conf SimulationConfig) printConfig() string {
-	out := "Current config:\n"
-	v := reflect.ValueOf(conf)
-	typeOfConf := v.Type()
-	for i := 0; i < typeOfConf.NumField(); i++ {
-		out += fmt.Sprintf("%s: %v\n", typeOfConf.Field(i).Name, v.Field(i).Interface())
-	}
-	out += "\n"
+func (cfg SimulationConfig) printConfig() string {
+	out := fmt.Sprintf(
+		`Current config:
+	Workers:                          Stone Masses:
+        A = %-4d                          A = %-4d
+        B = %-4d                          B = %-4d
+        C = %-4d                          C = %-4d
+
+	Stone Extraction Times:           Stone Masses Limits:         
+        A (min = %-4d max = %-4d)         1.Layer = %-4d
+        B (min = %-4d max = %-4d)         2.Layer = %-4d
+        C (min = %-4d max = %-4d)         3.Layer = %-4d
+
+	Time To Travel Empty:       min = %-4d max = %-4d
+	Time To Travel Full:        min = %-4d max = %-4d
+	Time To Place Stone:        min = %-4d max = %-4d
+	Time To Place Insulation:   min = %-4d max = %-4d
+	Time To Change Pallet:      min = %-4d max = %-4d
+
+	Quarry Workplaces = %-2d`,
+		cfg.WorkersAmount[0], cfg.StonesMasses[0],
+		cfg.WorkersAmount[1], cfg.StonesMasses[1],
+		cfg.WorkersAmount[2], cfg.StonesMasses[2],
+		cfg.StonesExtractionTime[0][0], cfg.StonesExtractionTime[0][1], cfg.StoneMassesLimits[0],
+		cfg.StonesExtractionTime[1][0], cfg.StonesExtractionTime[1][1], cfg.StoneMassesLimits[1],
+		cfg.StonesExtractionTime[2][0], cfg.StonesExtractionTime[2][1], cfg.StoneMassesLimits[2],
+		cfg.TimeToTravelEmpty[0], cfg.TimeToTravelEmpty[1],
+		cfg.TimeToTravelFull[0], cfg.TimeToTravelFull[1],
+		cfg.TimeToPlaceStone[0], cfg.TimeToPlaceStone[1],
+		cfg.TimeToPlaceInsulation[0], cfg.TimeToPlaceInsulation[1],
+		cfg.TimeToChangePallet[0], cfg.TimeToChangePallet[1],
+		cfg.QuarryWorkplaces)
 	return out
 }
 
-func (conf SimulationConfig) saveConfig() error {
+func (cfg SimulationConfig) saveConfig() error {
 	file, err := os.Create("./config.json")
 	if err != nil {
 		fmt.Println("Couldn't create config file")
 		return err
 	}
 	var str []byte
-	str, err = json.Marshal(conf)
+	str, err = json.Marshal(cfg)
 	if err != nil {
 		fmt.Println("Couldn't create json")
 		return err

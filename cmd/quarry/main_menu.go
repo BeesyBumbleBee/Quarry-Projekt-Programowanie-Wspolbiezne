@@ -198,28 +198,20 @@ func (m *MainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyEsc:
 			m.inConfig = false
 		case tea.KeyShiftTab, tea.KeyCtrlP:
-			m.msg = ""
 			m.prevInput()
 		case tea.KeyTab, tea.KeyCtrlN:
-			m.msg = ""
 			m.nextInput()
 		case tea.KeyUp:
-			m.menuOptionFocused = int(math.Abs(float64(m.menuOptionFocused-1))) % len(m.menuOptions)
-			for i := range m.menuOptions {
-				if i == m.menuOptionFocused {
-					m.menuOptions[i] = selector
-				} else {
-					m.menuOptions[i] = ' '
-				}
+			if m.inConfig {
+				m.prevInput()
+			} else {
+				m.nextMenuOption()
 			}
 		case tea.KeyDown:
-			m.menuOptionFocused = (m.menuOptionFocused + 1) % len(m.menuOptions)
-			for i := range m.menuOptions {
-				if i == m.menuOptionFocused {
-					m.menuOptions[i] = selector
-				} else {
-					m.menuOptions[i] = ' '
-				}
+			if m.inConfig {
+				m.nextInput()
+			} else {
+				m.prevMenuOption()
 			}
 		}
 		for i := range m.inputs {
@@ -242,23 +234,46 @@ func (m *MainMenu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m *MainMenu) View() string {
 	var view string
+	tea.ClearScreen()
 	if m.inConfig {
 		view = fmt.Sprintf(
 			`%s
 %s
 
-Workers:                 A = %s B = %s C = %s 
-Stone Masses:            A = %s B = %s C = %s
+Workers:                 
+        A = %s
+        B = %s 
+        C = %s
 
-Stone Masses Limits:     1.Layer = %s 2.Layer = %s 3.Layer = %s
+Stone Masses:            
+        A = %s 
+        B = %s
+        C = %s
 
-Stones Extraction Times: A (min = %s max = %s) B (min = %s max = %s) C (min = %s max = %s)
+Stone Masses Limits:     
+        1.Layer = %s 
+        2.Layer = %s 
+        3.Layer = %s
 
-Time To Travel Empty:       min = %s max = %s
-Time To Travel Full:        min = %s max = %s
-Time To Place Stone:        min = %s max = %s
-Time To Place Insulation:   min = %s max = %s
-Time To Change Pallet:      min = %s max = %s
+Stones Extraction Times: 
+        A (min = %s max = %s) 
+        B (min = %s max = %s) 
+        C (min = %s max = %s)
+
+Time To Travel Empty:       
+        min = %s max = %s
+
+Time To Travel Full:        
+        min = %s max = %s
+
+Time To Place Stone:        
+        min = %s max = %s
+
+Time To Place Insulation:   
+        min = %s max = %s
+
+Time To Change Pallet:      
+        min = %s max = %s
 
 Quarry Workplaces = %s
 
@@ -308,12 +323,36 @@ Press Ctrl-Q to quit.
 }
 
 // nextInput focuses the next input field
+func (m *MainMenu) prevMenuOption() {
+	m.menuOptionFocused = (m.menuOptionFocused + 1) % len(m.menuOptions)
+	for i := range m.menuOptions {
+		if i == m.menuOptionFocused {
+			m.menuOptions[i] = selector
+		} else {
+			m.menuOptions[i] = ' '
+		}
+	}
+}
+
+func (m *MainMenu) nextMenuOption() {
+	m.menuOptionFocused = int(math.Abs(float64(m.menuOptionFocused-1))) % len(m.menuOptions)
+	for i := range m.menuOptions {
+		if i == m.menuOptionFocused {
+			m.menuOptions[i] = selector
+		} else {
+			m.menuOptions[i] = ' '
+		}
+	}
+}
+
 func (m *MainMenu) nextInput() {
 	m.configInputFocused = (m.configInputFocused + 1) % len(m.inputs)
+	m.msg = ""
 }
 
 // prevInput focuses the previous input field
 func (m *MainMenu) prevInput() {
+	m.msg = ""
 	m.configInputFocused--
 	// Wrap around
 	if m.configInputFocused < 0 {
